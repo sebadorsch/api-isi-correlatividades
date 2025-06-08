@@ -1,7 +1,7 @@
 import { IsArray, IsInt, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class AddSubjectsDto {
+export class SubjectsDto {
   @ApiProperty({ type: [Number], required: false })
   @IsOptional()
   @IsArray()

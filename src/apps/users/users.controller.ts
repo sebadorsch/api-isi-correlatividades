@@ -8,16 +8,14 @@ import {
   Delete, UseGuards, Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { ApiTags } from '@nestjs/swagger';
-import { request } from 'express';
 import { UpdateUserSubjectsDto } from './dto/update-user-subjects.dto';
-import { AddSubjectsDto } from '../subjects/dto/add-subjects.dto';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { ROLES } from '../auth/guards/roles';
+import { SubjectsDto } from '../subjects/dto/add-subjects.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -25,7 +23,7 @@ import { ROLES } from '../auth/guards/roles';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Roles(ROLES.ADMIN)
+  @Roles(ROLES.USER)
   @Get('/subjects')
   getUserSubjects(@Req() request: Request,) {
     const { id } = request['user'];
@@ -33,14 +31,28 @@ export class UsersController {
     return this.usersService.getUserSubjects(+id);
   }
 
-  @Roles(ROLES.ADMIN)
-  @Post(':id/add-subjects')
+  @Roles(ROLES.USER)
+  @Post('/add-subjects')
   async addSubjects(
-    @Param('id') id: string,
-    @Body() addSubjectsDto: AddSubjectsDto,
+    @Req() request: Request,
+    @Body() addSubjectsDto: SubjectsDto,
   ) {
+    const { id } = request['user'];
+
     return this.usersService.addSubjects(+id, addSubjectsDto);
   }
+
+  @Roles(ROLES.USER)
+  @Post('/remove-subjects')
+  async removeSubjects(
+    @Req() request: Request,
+    @Body() removeSubjectsDto: SubjectsDto,
+  ) {
+    const { id } = request['user'];
+
+    return this.usersService.removeSubjects(+id, removeSubjectsDto);
+  }
+
 
   @Roles(ROLES.ADMIN)
   @Patch('/subjects')
@@ -54,17 +66,12 @@ export class UsersController {
   }
 
   @Roles(ROLES.ADMIN)
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
-
-  @Roles(ROLES.ADMIN)
   @Get()
   findAll() {
     return this.usersService.findAll();
   }
 
+  @Roles(ROLES.USER)
   @Get('me')
   findMe(@Req() request: Request) {
     const { id } = request['user'];
@@ -80,7 +87,9 @@ export class UsersController {
 
   @Roles(ROLES.ADMIN)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  update(@Req() request: Request, @Body() updateUserDto: UpdateUserDto) {
+    const { id } = request['user'];
+
     return this.usersService.update(+id, updateUserDto);
   }
 

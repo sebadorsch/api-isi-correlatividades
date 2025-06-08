@@ -4,10 +4,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { StatusResponse } from '../../common/dtos/successful-response.dto';
 import { PrismaService } from '../../config/prisma/prisma.service';
 import { User } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
 import { hashPassword } from '../../common/utils';
 import { UpdateUserSubjectsDto } from './dto/update-user-subjects.dto';
-import { AddSubjectsDto } from '../subjects/dto/add-subjects.dto';
+import { SubjectsDto } from '../subjects/dto/add-subjects.dto';
 
 @Injectable()
 export class UsersService {
@@ -182,7 +181,7 @@ export class UsersService {
     }
   }
 
-  async addSubjects(userId: number, dto: AddSubjectsDto): Promise<User> {
+  async addSubjects(userId: number, dto: SubjectsDto): Promise<User> {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
 
     if (!user) {
@@ -205,6 +204,32 @@ export class UsersService {
       },
     });
   }
+
+  async removeSubjects(userId: number, dto: SubjectsDto): Promise<User> {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    const updatedRegularized = (user.regularizedSubjects || []).filter(
+      subject => !(dto.regularizedSubjects ?? []).includes(subject),
+    );
+
+    const updatedApproved = (user.approvedSubjects || []).filter(
+      subject => !(dto.approvedSubjects ?? []).includes(subject),
+    );
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        regularizedSubjects: updatedRegularized,
+        approvedSubjects: updatedApproved,
+      },
+    });
+  }
+
+
 
   async updateSubjects(id: number, dto: UpdateUserSubjectsDto): Promise<User> {
     try {
