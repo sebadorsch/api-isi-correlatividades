@@ -13,3 +13,15 @@ model User {
   name      String?
   createdAt DateTime @default(now())
 }
+
+enum TermType {
+  ANUAL
+  CUATRIMESTRAL
+}
+
+model Subject {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(100)
+  termType   TermType
+  totalHours Int
+}
