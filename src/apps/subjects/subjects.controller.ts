@@ -15,6 +15,7 @@ import { ROLES } from '../auth/guards/roles';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { ApiTags } from '@nestjs/swagger';
+import { Public } from '../auth/decorators/public.decorator';
 
 @ApiTags('Subjects')
 @Controller('subjects')
@@ -23,21 +24,25 @@ export class SubjectsController {
   constructor(private readonly subjectsService: SubjectsService) {}
 
   @Roles(ROLES.ADMIN)
+  @Roles(ROLES.ADMIN)
   @Post()
   create(@Body() createSubjectDto: CreateSubjectDto) {
     return this.subjectsService.create(createSubjectDto);
   }
 
+  @Public()
   @Get()
   findAll() {
     return this.subjectsService.findAll();
   }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.subjectsService.findOne(id);
   }
 
+  @Roles(ROLES.ADMIN)
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -46,6 +51,7 @@ export class SubjectsController {
     return this.subjectsService.update(id, updateSubjectDto);
   }
 
+  @Roles(ROLES.ADMIN)
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.subjectsService.remove(id);

@@ -6,6 +6,8 @@ import { PrismaService } from '../../config/prisma/prisma.service';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { hashPassword } from '../../common/utils';
+import { UpdateUserSubjectsDto } from './dto/update-user-subjects.dto';
+import { AddSubjectsDto } from '../subjects/dto/add-subjects.dto';
 
 @Injectable()
 export class UsersService {
@@ -127,6 +129,78 @@ export class UsersService {
       this.logger.error(e);
       throw new HttpException(
         e.response?.message ?? 'Error deleting user',
+        e.response?.statusCode ?? 409,
+      );
+    }
+  }
+
+  async getUserSubjects(id: number) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id },
+      });
+
+      if (!user) throw new NotFoundException('User not found');
+
+      const [regularized, approved] = await Promise.all([
+        this.prisma.subject.findMany({
+          where: { code: { in: user.regularizedSubjects } },
+        }),
+        this.prisma.subject.findMany({
+          where: { code: { in: user.approvedSubjects } },
+        }),
+      ]);
+
+      return {
+        regularizedSubjects: regularized,
+        approvedSubjects: approved,
+      };
+    } catch (e) {
+      this.logger.error(e);
+      throw new HttpException(
+        e.response?.message ?? 'Error fetching user subjects',
+        e.response?.statusCode ?? 409,
+      );
+    }
+  }
+
+  async addSubjects(userId: number, dto: AddSubjectsDto): Promise<User> {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    const updatedRegularized = dto.regularizedSubjects
+      ? Array.from(new Set([...(user.regularizedSubjects || []), ...dto.regularizedSubjects]))
+      : user.regularizedSubjects;
+
+    const updatedApproved = dto.approvedSubjects
+      ? Array.from(new Set([...(user.approvedSubjects || []), ...dto.approvedSubjects]))
+      : user.approvedSubjects;
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        regularizedSubjects: updatedRegularized,
+        approvedSubjects: updatedApproved,
+      },
+    });
+  }
+
+  async updateSubjects(id: number, dto: UpdateUserSubjectsDto): Promise<User> {
+    try {
+      return await this.prisma.user.update({
+        where: { id },
+        data: {
+          ...(dto.regularizedSubjects && { regularizedSubjects: dto.regularizedSubjects }),
+          ...(dto.approvedSubjects && { approvedSubjects: dto.approvedSubjects }),
+        },
+      });
+    } catch (e) {
+      this.logger.error(e);
+      throw new HttpException(
+        e.response?.message ?? 'Error updating user subjects',
         e.response?.statusCode ?? 409,
       );
     }
