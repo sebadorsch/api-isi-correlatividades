@@ -94,6 +94,24 @@ export class UsersService {
     }
   }
 
+  async findByEmailWithPassword(email: string): Promise<any> {
+    try {
+      const user = this.prisma.user.findUnique({
+        where: { email },
+      });
+
+      if (!user) throw new NotFoundException('User not found');
+
+      return user;
+    } catch (e) {
+      this.logger.error(e);
+      throw new HttpException(
+        e.response?.message ?? 'Error getting user',
+        e.response?.statusCode ?? 409,
+      );
+    }
+  }
+
   async update(id: number, updateUserDto: UpdateUserDto): Promise<any> {
     try {
       const data: any = { ...updateUserDto };

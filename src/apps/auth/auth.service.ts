@@ -60,7 +60,7 @@ export class AuthService {
    * @returns Promise<SignInDto>
    */
   async signIn(email: string, pwd: string): Promise<TokenDto> {
-    const user = (await this.usersService.findByEmail(email));
+    const user = (await this.usersService.findByEmailWithPassword(email));
 
     if (!user){
       throw new UnauthorizedException('Bad credentials');
