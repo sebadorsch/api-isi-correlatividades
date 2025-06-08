@@ -24,7 +24,6 @@ export class SubjectsController {
   constructor(private readonly subjectsService: SubjectsService) {}
 
   @Roles(ROLES.ADMIN)
-  @Roles(ROLES.ADMIN)
   @Post()
   create(@Body() createSubjectDto: CreateSubjectDto) {
     return this.subjectsService.create(createSubjectDto);

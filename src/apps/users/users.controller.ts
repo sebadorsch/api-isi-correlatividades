@@ -16,6 +16,8 @@ import { ApiTags } from '@nestjs/swagger';
 import { request } from 'express';
 import { UpdateUserSubjectsDto } from './dto/update-user-subjects.dto';
 import { AddSubjectsDto } from '../subjects/dto/add-subjects.dto';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { ROLES } from '../auth/guards/roles';
 
 @ApiTags('Users')
 @Controller('users')
@@ -23,6 +25,7 @@ import { AddSubjectsDto } from '../subjects/dto/add-subjects.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Roles(ROLES.ADMIN)
   @Get('/subjects')
   getUserSubjects(@Req() request: Request,) {
     const { id } = request['user'];
@@ -30,6 +33,7 @@ export class UsersController {
     return this.usersService.getUserSubjects(+id);
   }
 
+  @Roles(ROLES.ADMIN)
   @Post(':id/add-subjects')
   async addSubjects(
     @Param('id') id: string,
@@ -38,6 +42,7 @@ export class UsersController {
     return this.usersService.addSubjects(+id, addSubjectsDto);
   }
 
+  @Roles(ROLES.ADMIN)
   @Patch('/subjects')
   updateSubjects(
     @Req() request: Request,
@@ -48,11 +53,13 @@ export class UsersController {
     return this.usersService.updateSubjects(+id, dto);
   }
 
+  @Roles(ROLES.ADMIN)
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
+  @Roles(ROLES.ADMIN)
   @Get()
   findAll() {
     return this.usersService.findAll();
@@ -65,16 +72,19 @@ export class UsersController {
     return this.usersService.findById(id);
   }
 
+  @Roles(ROLES.ADMIN)
   @Get(':id')
   findById(@Param('id') id: string) {
     return this.usersService.findById(+id);
   }
 
+  @Roles(ROLES.ADMIN)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
 
+  @Roles(ROLES.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
