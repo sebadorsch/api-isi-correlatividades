@@ -1,20 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsEmail, IsEnum, IsOptional } from 'class-validator';
+import { IsOptional, IsString, IsEmail, IsEnum } from 'class-validator';
 import { Role } from '@prisma/client';
 
-export class CreateUserDto {
+export class UserDto {
+  @ApiProperty()
+  id: number;
+
   @ApiProperty()
   @IsEmail()
   email: string;
 
   @ApiProperty()
   @IsString()
-  password: string;
-
-  @ApiProperty({ enum: Role })
-  @IsOptional()
-  @IsEnum(Role)
-  role?: Role;
+  password?: string;
 
   @ApiProperty()
   @IsOptional()
@@ -25,4 +23,14 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   lastName?: string;
+
+  @ApiProperty({ enum: Role })
+  @IsEnum(Role)
+  role: Role;
+
+  @ApiProperty()
+  createdAt?: Date;
+
+  @ApiProperty()
+  updatedAt?: Date;
 }

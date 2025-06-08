@@ -7,11 +7,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
+  password  String
+  role      Role     @default(USER)
+  firstName String?
+  lastName  String?
+  created   DateTime @default(now())
+  edited    DateTime @default(now())
 }
 
 enum TermType {
@@ -20,8 +29,14 @@ enum TermType {
 }
 
 model Subject {
-  id         Int      @id @default(autoincrement())
-  name       String   @db.VarChar(100)
-  termType   TermType
-  totalHours Int
+  id                       Int       @id @default(autoincrement())
+  name                     String    @db.VarChar(100)
+  code                     Int       @unique
+  termType                 TermType?
+  totalHours               Int?
+  annualHours              Int?
+  weeklyHours              Int?
+  courseYear               Int?
+  requiredSubjectsToEnroll Int[]
+  requiredSubjectsToPass   Int[]
 }

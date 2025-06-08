@@ -6,15 +6,23 @@ import {
   Patch,
   Param,
   Delete,
-  ParseIntPipe,
+  ParseIntPipe, UseGuards,
 } from '@nestjs/common';
 import { SubjectsService } from './subjects.service';
 import { CreateSubjectDto, UpdateSubjectDto } from './dto';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { ROLES } from '../auth/guards/roles';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Subjects')
 @Controller('subjects')
+@UseGuards(AuthGuard, RolesGuard)
 export class SubjectsController {
   constructor(private readonly subjectsService: SubjectsService) {}
 
+  @Roles(ROLES.ADMIN)
   @Post()
   create(@Body() createSubjectDto: CreateSubjectDto) {
     return this.subjectsService.create(createSubjectDto);
