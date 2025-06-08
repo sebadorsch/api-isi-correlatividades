@@ -2,16 +2,30 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:latest
+    image: postgres:17
     container_name: correlatividades-database
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "${DB_PORT}:5432"
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: correlatividades-app
+    environment:
+      DATABASE_URL: "postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}"
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+    command: sh -c "npx prisma migrate deploy && npm run start:prod"
+    restart: on-failure
 
 volumes:
   postgres_data:
