@@ -47,7 +47,7 @@ async function bootstrap() {
     });
   } else {
     app.enableCors({
-      origin: 'https://correlatividades-frontend-lpu4ldfrk.vercel.app/',
+      origin: 'https://correlatividades-frontend.vercel.app',
     });
   }
   await app.listen(appPort);
