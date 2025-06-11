@@ -41,9 +41,15 @@ async function bootstrap() {
   });
 
   const appPort = process.env.PORT ?? 3000;
-  app.enableCors({
-    origin: '*',
-  });
+  if (process.env.NODE_ENV === 'local') {
+    app.enableCors({
+      origin: '*',
+    });
+  } else {
+    app.enableCors({
+      origin: 'https://correlatividades-frontend-lpu4ldfrk.vercel.app/',
+    });
+  }
   await app.listen(appPort);
   console.log('🚀 Server ready at port:', appPort);
 }
