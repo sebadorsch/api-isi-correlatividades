@@ -41,15 +41,13 @@ async function bootstrap() {
   });
 
   const appPort = process.env.PORT ?? 3000;
-  if (process.env.NODE_ENV === 'local') {
-    app.enableCors({
-      origin: '*',
-    });
-  } else {
-    app.enableCors({
-      origin: 'https://correlatividades-frontend.vercel.app',
-    });
-  }
+  const allowedOrigin = process.env.FRONTEND_URL ?? '*';
+  app.enableCors({
+    origin: allowedOrigin,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  });
   await app.listen(appPort);
   console.log('🚀 Server ready at port:', appPort);
 }
