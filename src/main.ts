@@ -41,9 +41,13 @@ async function bootstrap() {
   });
 
   const appPort = process.env.PORT ?? 3000;
-  const allowedOrigin = process.env.FRONTEND_URL ?? '*';
+  // FRONTEND_URL acepta varios dominios separados por coma; sin definir, se permite cualquiera.
+  const allowedOrigins = (process.env.FRONTEND_URL ?? '')
+    .split(',')
+    .map((origin) => origin.trim().replace(/\/$/, ''))
+    .filter(Boolean);
   app.enableCors({
-    origin: allowedOrigin,
+    origin: allowedOrigins.length > 0 ? allowedOrigins : '*',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
