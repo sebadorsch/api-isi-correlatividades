@@ -23,6 +23,9 @@ model User {
   edited              DateTime @default(now())
   regularizedSubjects Int[]    @default([])
   approvedSubjects    Int[]    @default([])
+  electiveHoursLevel3 Int      @default(0)
+  electiveHoursLevel4 Int      @default(0)
+  electiveHoursLevel5 Int      @default(0)
 }
 
 enum TermType {
@@ -41,4 +44,5 @@ model Subject {
   courseYear               Int?
   requiredSubjectsToEnroll Int[]
   requiredSubjectsToPass   Int[]
+  intermediateTitleOnly    Boolean   @default(false)
 }

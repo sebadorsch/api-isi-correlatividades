@@ -27,6 +27,8 @@ const subjects: Prisma.SubjectCreateInput[] = [
   { name: "Comunicación de Datos", code: 21, termType: 'ANUAL', totalHours: 0, annualHours: 0, weeklyHours: 4, courseYear: 3, requiredSubjectsToEnroll: [], requiredSubjectsToPass: [3, 7] },
   { name: "Análisis Numérico", code: 22, termType: 'ANUAL', totalHours: 0, annualHours: 0, weeklyHours: 3, courseYear: 3, requiredSubjectsToEnroll: [9], requiredSubjectsToPass: [1, 2] },
   { name: "Diseño de Sistemas de Información", code: 23, termType: 'ANUAL', totalHours: 0, annualHours: 0, weeklyHours: 6, courseYear: 3, requiredSubjectsToEnroll: [14, 16], requiredSubjectsToPass: [4, 6, 8] },
+  // Solo para el título intermedio de Analista (orden 24 en su plan; acá 37 para no chocar con Legislación).
+  { name: "Seminario Integrador", code: 37, termType: 'ANUAL', totalHours: 0, annualHours: 0, weeklyHours: 4, courseYear: 3, requiredSubjectsToEnroll: [16], requiredSubjectsToPass: [6, 8, 13, 14], intermediateTitleOnly: true },
 
   { name: "Legislación", code: 24, termType: 'ANUAL', totalHours: 0, annualHours: 0, weeklyHours: 2, courseYear: 4, requiredSubjectsToEnroll: [11], requiredSubjectsToPass: [] },
   { name: "Ingeniería y Calidad de Software", code: 25, termType: 'CUATRIMESTRAL', totalHours: 0, annualHours: 0, weeklyHours: 3, courseYear: 4, requiredSubjectsToEnroll: [19, 20, 23], requiredSubjectsToPass: [13, 14] },

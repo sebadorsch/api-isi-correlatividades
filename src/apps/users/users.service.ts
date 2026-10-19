@@ -238,6 +238,9 @@ export class UsersService {
         data: {
           ...(dto.regularizedSubjects && { regularizedSubjects: dto.regularizedSubjects }),
           ...(dto.approvedSubjects && { approvedSubjects: dto.approvedSubjects }),
+          ...(dto.electiveHoursLevel3 !== undefined && { electiveHoursLevel3: dto.electiveHoursLevel3 }),
+          ...(dto.electiveHoursLevel4 !== undefined && { electiveHoursLevel4: dto.electiveHoursLevel4 }),
+          ...(dto.electiveHoursLevel5 !== undefined && { electiveHoursLevel5: dto.electiveHoursLevel5 }),
         },
       });
     } catch (e) {

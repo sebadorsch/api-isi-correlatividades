@@ -1,4 +1,4 @@
-import { ArrayNotEmpty, ArrayUnique, IsArray, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
+import { ArrayNotEmpty, ArrayUnique, IsArray, IsBoolean, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 import { TermType } from '../enum/term-type.enum';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -40,4 +40,9 @@ export class CreateSubjectDto {
   @IsArray()
   @ArrayNotEmpty()
   requiredSubjectsToPass: number[];
+
+  @ApiPropertyOptional({ description: 'Materia que solo exige el título intermedio de Analista' })
+  @IsOptional()
+  @IsBoolean()
+  intermediateTitleOnly?: boolean;
 }
