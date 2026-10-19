@@ -54,7 +54,7 @@ export class UsersController {
   }
 
 
-  @Roles(ROLES.ADMIN)
+  @Roles(ROLES.USER)
   @Patch('/subjects')
   updateSubjects(
     @Req() request: Request,
