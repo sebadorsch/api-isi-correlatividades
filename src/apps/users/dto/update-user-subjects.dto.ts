@@ -1,5 +1,36 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsInt, IsOptional, Max, Min } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  ArrayMaxSize, IsArray, IsIn, IsInt, IsOptional, IsString, Length, Max, Min, ValidateNested,
+} from 'class-validator';
+
+export const ELECTIVE_STATES = ['regular', 'aprobada'] as const;
+
+export class ElectiveDto {
+  @ApiProperty({ example: 'k3j9x2' })
+  @IsString()
+  @Length(1, 40)
+  id: string;
+
+  @ApiProperty({ example: 'Metodologías Ágiles' })
+  @IsString()
+  @Length(1, 100)
+  name: string;
+
+  @ApiProperty({ enum: [3, 4, 5] })
+  @IsIn([3, 4, 5])
+  level: number;
+
+  @ApiProperty({ description: 'Horas semanales', minimum: 1, maximum: 60 })
+  @IsInt()
+  @Min(1)
+  @Max(60)
+  hours: number;
+
+  @ApiProperty({ enum: ELECTIVE_STATES })
+  @IsIn(ELECTIVE_STATES)
+  state: (typeof ELECTIVE_STATES)[number];
+}
 
 export class UpdateUserSubjectsDto {
   @ApiProperty({ type: [Number], required: false })
@@ -34,4 +65,12 @@ export class UpdateUserSubjectsDto {
   @Min(0)
   @Max(60)
   electiveHoursLevel5?: number;
+
+  @ApiProperty({ type: [ElectiveDto], required: false })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(40)
+  @ValidateNested({ each: true })
+  @Type(() => ElectiveDto)
+  electives?: ElectiveDto[];
 }

@@ -5,11 +5,18 @@ import { StatusResponse } from '../../common/dtos/successful-response.dto';
 import { PrismaService } from '../../config/prisma/prisma.service';
 import { User } from '@prisma/client';
 import { hashPassword } from '../../common/utils';
-import { UpdateUserSubjectsDto } from './dto/update-user-subjects.dto';
+import { ElectiveDto, UpdateUserSubjectsDto } from './dto/update-user-subjects.dto';
 import { SubjectsDto } from '../subjects/dto/add-subjects.dto';
 
 // El hash de la contraseña nunca sale de la API.
 export type PublicUser = Omit<User, 'password'>;
+
+const approvedHoursByLevel = (electives: ElectiveDto[]) => {
+  const sum = (level: number) => electives
+    .filter((e) => e.level === level && e.state === 'aprobada')
+    .reduce((total, e) => total + e.hours, 0);
+  return { electiveHoursLevel3: sum(3), electiveHoursLevel4: sum(4), electiveHoursLevel5: sum(5) };
+};
 
 @Injectable()
 export class UsersService {
@@ -238,15 +245,27 @@ export class UsersService {
 
   async updateSubjects(id: number, dto: UpdateUserSubjectsDto): Promise<PublicUser> {
     try {
+      // Con la lista de electivas, las horas por nivel se derivan de las aprobadas (y pisan las que vengan sueltas).
+      const electiveFields = dto.electives
+        ? {
+          electives: dto.electives.map(({ id: electiveId, name, level, hours, state }) => ({
+            id: electiveId, name: name.trim(), level, hours, state,
+          })),
+          ...approvedHoursByLevel(dto.electives),
+        }
+        : {
+          ...(dto.electiveHoursLevel3 !== undefined && { electiveHoursLevel3: dto.electiveHoursLevel3 }),
+          ...(dto.electiveHoursLevel4 !== undefined && { electiveHoursLevel4: dto.electiveHoursLevel4 }),
+          ...(dto.electiveHoursLevel5 !== undefined && { electiveHoursLevel5: dto.electiveHoursLevel5 }),
+        };
+
       return await this.prisma.user.update({
         omit: { password: true },
         where: { id },
         data: {
           ...(dto.regularizedSubjects && { regularizedSubjects: dto.regularizedSubjects }),
           ...(dto.approvedSubjects && { approvedSubjects: dto.approvedSubjects }),
-          ...(dto.electiveHoursLevel3 !== undefined && { electiveHoursLevel3: dto.electiveHoursLevel3 }),
-          ...(dto.electiveHoursLevel4 !== undefined && { electiveHoursLevel4: dto.electiveHoursLevel4 }),
-          ...(dto.electiveHoursLevel5 !== undefined && { electiveHoursLevel5: dto.electiveHoursLevel5 }),
+          ...electiveFields,
         },
       });
     } catch (e) {

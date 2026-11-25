@@ -26,6 +26,9 @@ model User {
   electiveHoursLevel3 Int      @default(0)
   electiveHoursLevel4 Int      @default(0)
   electiveHoursLevel5 Int      @default(0)
+  // Electivas que carga el alumno: [{ id, name, level (3-5), hours, state ('regular' | 'aprobada') }].
+  // Las horas por nivel de arriba quedan como suma de las aprobadas, por compatibilidad.
+  electives           Json     @default("[]")
 }
 
 enum TermType {
