@@ -8,6 +8,9 @@ import { hashPassword } from '../../common/utils';
 import { UpdateUserSubjectsDto } from './dto/update-user-subjects.dto';
 import { SubjectsDto } from '../subjects/dto/add-subjects.dto';
 
+// El hash de la contraseña nunca sale de la API.
+export type PublicUser = Omit<User, 'password'>;
+
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger();
@@ -181,7 +184,7 @@ export class UsersService {
     }
   }
 
-  async addSubjects(userId: number, dto: SubjectsDto): Promise<User> {
+  async addSubjects(userId: number, dto: SubjectsDto): Promise<PublicUser> {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
 
     if (!user) {
@@ -197,6 +200,7 @@ export class UsersService {
       : user.approvedSubjects;
 
     return this.prisma.user.update({
+      omit: { password: true },
       where: { id: userId },
       data: {
         regularizedSubjects: updatedRegularized,
@@ -205,7 +209,7 @@ export class UsersService {
     });
   }
 
-  async removeSubjects(userId: number, dto: SubjectsDto): Promise<User> {
+  async removeSubjects(userId: number, dto: SubjectsDto): Promise<PublicUser> {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
 
     if (!user) {
@@ -221,6 +225,7 @@ export class UsersService {
     );
 
     return this.prisma.user.update({
+      omit: { password: true },
       where: { id: userId },
       data: {
         regularizedSubjects: updatedRegularized,
@@ -231,9 +236,10 @@ export class UsersService {
 
 
 
-  async updateSubjects(id: number, dto: UpdateUserSubjectsDto): Promise<User> {
+  async updateSubjects(id: number, dto: UpdateUserSubjectsDto): Promise<PublicUser> {
     try {
       return await this.prisma.user.update({
+        omit: { password: true },
         where: { id },
         data: {
           ...(dto.regularizedSubjects && { regularizedSubjects: dto.regularizedSubjects }),
